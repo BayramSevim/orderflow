@@ -1,9 +1,15 @@
+using Microsoft.EntityFrameworkCore;
+using OrderFlow.Infrastructure.Persistence;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+builder.Services.AddDbContext<OrderFlowDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("OrderFlow")));
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
