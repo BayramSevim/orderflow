@@ -10,5 +10,10 @@ namespace OrderFlow.Infrastructure.Persistence
         public OrderFlowDbContext(DbContextOptions<OrderFlowDbContext> options) : base(options)
         {
         }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(OrderFlowDbContext).Assembly);
+        }
     }
 }
