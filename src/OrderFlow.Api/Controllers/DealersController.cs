@@ -21,5 +21,16 @@ namespace OrderFlow.Api.Controllers
             var id = await _dealerService.CreateAsync(request.Code, request.Name, request.CreditLimit, cancellationToken);
             return Ok(new { id });
         }
+
+        [HttpGet("{id:guid}")]
+        public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
+        {
+            var dealer = await _dealerService.GetByIdAsync(id, cancellationToken);
+
+            if (dealer is null)
+                return NotFound();
+
+            return Ok(dealer);
+        }
     }
 }

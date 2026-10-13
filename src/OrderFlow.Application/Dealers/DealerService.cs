@@ -31,5 +31,15 @@ namespace OrderFlow.Application.Dealers
 
             return dealer.Id;
         }
+
+        public async Task<DealerResponse?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+        {
+            var dealer = await _dealerRepository.GetByIdAsync(id, cancellationToken);
+
+            if (dealer is null)
+                return null;
+
+            return new DealerResponse(dealer.Id, dealer.Code, dealer.Name, dealer.CreditLimit, dealer.IsActive);
+        }
     }
 }
