@@ -53,6 +53,58 @@ namespace OrderFlow.Infrastructure.Migrations
                     b.ToTable("dealers", (string)null);
                 });
 
+            modelBuilder.Entity("OrderFlow.Domain.Orders.Order", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("DealerId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("orders", (string)null);
+                });
+
+            modelBuilder.Entity("OrderFlow.Domain.Orders.OrderItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ProductName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("UnitPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
+
+                    b.ToTable("order_items", (string)null);
+                });
+
             modelBuilder.Entity("OrderFlow.Domain.Products.Product", b =>
                 {
                     b.Property<Guid>("Id")
@@ -85,6 +137,20 @@ namespace OrderFlow.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("products", (string)null);
+                });
+
+            modelBuilder.Entity("OrderFlow.Domain.Orders.OrderItem", b =>
+                {
+                    b.HasOne("OrderFlow.Domain.Orders.Order", null)
+                        .WithMany("Items")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("OrderFlow.Domain.Orders.Order", b =>
+                {
+                    b.Navigation("Items");
                 });
 #pragma warning restore 612, 618
         }
