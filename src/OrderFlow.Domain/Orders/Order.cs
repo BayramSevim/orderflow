@@ -32,5 +32,39 @@ namespace OrderFlow.Domain.Orders
             OrderItem orderItem = new OrderItem(productId, productName, unitPrice, quantity);
             _items.Add(orderItem);
         }
+
+        public void Approve()
+        {
+            if (Status != OrderStatus.Pending)
+                throw new DomainException("Only pending orders can be approved");
+            if (_items.Count == 0)
+                throw new DomainException("Cannot approve an empty order");
+
+            Status = OrderStatus.Approved;
+        }
+
+        public void Ship()
+        {
+            if (Status != OrderStatus.Approved)
+                throw new DomainException("Only approved orders can be shipped");
+
+            Status = OrderStatus.Shipped;
+        }
+
+        public void Deliver()
+        {
+            if (Status != OrderStatus.Shipped)
+                throw new DomainException("Only shipped orders can be delivered");
+
+            Status = OrderStatus.Delivered;
+        }
+
+        public void Cancel()
+        {
+            if (Status != OrderStatus.Pending && Status != OrderStatus.Approved)
+                throw new DomainException("Only pending or approved orders can be cancelled");
+
+            Status = OrderStatus.Cancelled;
+        }
     }
 }
