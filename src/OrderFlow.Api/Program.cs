@@ -16,6 +16,8 @@ builder.Services.AddDbContext<OrderFlowDbContext>(options =>
 builder.Services.AddScoped<IDealerRepository, DealerRepository>();
 builder.Services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<OrderFlowDbContext>());
 
+builder.Services.AddScoped<DealerService>();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
