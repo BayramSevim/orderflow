@@ -27,5 +27,10 @@ namespace OrderFlow.Infrastructure.Persistence.Repositories
         {
             await _context.Dealers.AddAsync(dealer, cancellationToken);
         }
+
+        public async Task<List<Dealer>> GetDealersAsync(CancellationToken cancellationToken)
+        {
+            return await _context.Dealers.ToListAsync(cancellationToken);
+        }
     }
 }

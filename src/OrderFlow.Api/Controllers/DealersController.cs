@@ -32,5 +32,11 @@ namespace OrderFlow.Api.Controllers
 
             return Ok(dealer);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetDealers(CancellationToken cancellationToken)
+        {
+            return Ok(await _dealerService.GetDealersAsync(cancellationToken));
+        }
     }
 }
