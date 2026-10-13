@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using OrderFlow.Api.ErrorHandling;
 using OrderFlow.Application.Common;
 using OrderFlow.Application.Dealers;
 using OrderFlow.Infrastructure.Persistence;
@@ -19,10 +20,16 @@ builder.Services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<OrderFlowDbC
 // Services
 builder.Services.AddScoped<DealerService>();
 
+// ExceptionHandler
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+app.UseExceptionHandler();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
