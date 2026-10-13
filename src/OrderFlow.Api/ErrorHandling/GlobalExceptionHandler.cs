@@ -18,47 +18,25 @@ namespace OrderFlow.Api.ErrorHandling
         }
         public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
         {
-            ProblemDetails problem;
+            var (status, title) = exception switch
+            {
+                NotFoundException => (StatusCodes.Status404NotFound, "Resource not found"),
+                ConflictException => (StatusCodes.Status409Conflict, "Conflict"),
+                DomainException => (StatusCodes.Status400BadRequest, "Business rule violation"),
+                _ => (StatusCodes.Status500InternalServerError, "An unexpected error occurred")
+            };
 
-            if (exception is NotFoundException)
-            {
-                problem = new ProblemDetails
-                {
-                    Status = StatusCodes.Status404NotFound,
-                    Title = "Resource not found",
-                    Detail = exception.Message
-                };
-            }
-            else if (exception is ConflictException)
-            {
-                problem = new ProblemDetails
-                {
-                    Status = StatusCodes.Status409Conflict,
-                    Title = "Conflict",
-                    Detail = exception.Message
-                };
-            }
-            else if (exception is DomainException)
-            {
-                problem = new ProblemDetails
-                {
-                    Status = StatusCodes.Status400BadRequest,
-                    Title = "Business rule violation",
-                    Detail = exception.Message
-                };
-            }
-            else
-            {
+            if (status == StatusCodes.Status500InternalServerError)
                 _logger.LogError(exception, "Unhandled exception");
 
-                problem = new ProblemDetails
-                {
-                    Status = StatusCodes.Status500InternalServerError,
-                    Title = "An unexpected error occurred"
-                };
-            }
+            var problem = new ProblemDetails
+            {
+                Status = status,
+                Title = title,
+                Detail = exception is DomainException ? exception.Message : null
+            };
 
-            httpContext.Response.StatusCode = problem.Status.Value;
+            httpContext.Response.StatusCode = status;
             await httpContext.Response.WriteAsJsonAsync(problem, cancellationToken);
             return true;
         }
