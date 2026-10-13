@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using OrderFlow.Api.ErrorHandling;
 using OrderFlow.Application.Common;
 using OrderFlow.Application.Dealers;
+using OrderFlow.Application.Products;
 using OrderFlow.Infrastructure.Persistence;
 using OrderFlow.Infrastructure.Persistence.Repositories;
 
@@ -15,10 +16,12 @@ builder.Services.AddDbContext<OrderFlowDbContext>(options =>
 
 // Repository + Unit Of Work
 builder.Services.AddScoped<IDealerRepository, DealerRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<OrderFlowDbContext>());
 
 // Services
 builder.Services.AddScoped<DealerService>();
+builder.Services.AddScoped<ProductService>();
 
 // ExceptionHandler
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
