@@ -1,9 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+using OrderFlow.Application.Common;
 using OrderFlow.Domain.Dealers;
 
 namespace OrderFlow.Infrastructure.Persistence
 {
-    public class OrderFlowDbContext : DbContext
+    public class OrderFlowDbContext : DbContext, IUnitOfWork
     {
         public DbSet<Dealer> Dealers => Set<Dealer>();
 
@@ -15,5 +16,7 @@ namespace OrderFlow.Infrastructure.Persistence
         {
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(OrderFlowDbContext).Assembly);
         }
+
+        Task IUnitOfWork.SaveChangesAsync(CancellationToken cancellationToken) => base.SaveChangesAsync(cancellationToken);
     }
 }
