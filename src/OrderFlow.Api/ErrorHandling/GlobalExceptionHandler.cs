@@ -20,7 +20,25 @@ namespace OrderFlow.Api.ErrorHandling
         {
             ProblemDetails problem;
 
-            if (exception is DomainException)
+            if (exception is NotFoundException)
+            {
+                problem = new ProblemDetails
+                {
+                    Status = StatusCodes.Status404NotFound,
+                    Title = "Resource not found",
+                    Detail = exception.Message
+                };
+            }
+            else if (exception is ConflictException)
+            {
+                problem = new ProblemDetails
+                {
+                    Status = StatusCodes.Status409Conflict,
+                    Title = "Conflict",
+                    Detail = exception.Message
+                };
+            }
+            else if (exception is DomainException)
             {
                 problem = new ProblemDetails
                 {

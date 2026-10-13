@@ -22,7 +22,7 @@ namespace OrderFlow.Application.Dealers
         public async Task<Guid> CreateAsync(string code, string name, decimal creditLimit, CancellationToken cancellationToken)
         {
             if (await _dealerRepository.CodeExistsAsync(code, cancellationToken))
-                throw new DomainException("Dealer code already exists");
+                throw new ConflictException("Dealer code already exists");
 
             var dealer = new Dealer(code, name, creditLimit);
 
