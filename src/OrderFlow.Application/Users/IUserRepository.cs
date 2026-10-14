@@ -6,6 +6,6 @@ namespace OrderFlow.Application.Users
     {
         Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken);
         Task<bool> EmailExistsAsync(string email, CancellationToken cancellationToken);
-        Task AddAsync(User product, CancellationToken cancellationToken);
+        Task AddAsync(User user, CancellationToken cancellationToken);
     }
 }
