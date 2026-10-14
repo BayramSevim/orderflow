@@ -24,6 +24,7 @@ namespace OrderFlow.Api.ErrorHandling
                 NotFoundException => (StatusCodes.Status404NotFound, "Resource not found"),
                 ConflictException => (StatusCodes.Status409Conflict, "Conflict"),
                 UnauthorizedException => (StatusCodes.Status401Unauthorized, "Unauthorized"),
+                ForbiddenException => (StatusCodes.Status403Forbidden, "Forbidden"),
                 DomainException => (StatusCodes.Status400BadRequest, "Business rule violation"),
                 DbUpdateConcurrencyException => (StatusCodes.Status409Conflict, "Concurrency conflict"),
                 _ => (StatusCodes.Status500InternalServerError, "An unexpected error occurred")

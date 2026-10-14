@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using OrderFlow.Api.Auth;
 using OrderFlow.Api.ErrorHandling;
 using OrderFlow.Application.Common;
 using OrderFlow.Application.Common.Messaging;
@@ -41,6 +42,9 @@ builder.Services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<OrderFlowDbC
 // Services
 builder.Services.AddScoped<DealerService>();
 builder.Services.AddScoped<ProductService>();
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUser, CurrentUser>();
 
 // ExceptionHandler
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
