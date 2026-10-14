@@ -68,5 +68,23 @@ namespace OrderFlow.Application.Orders
                                             .ToList()
                                     );
         }
+
+        public async Task<List<Order>> GetOrdersAsync(CancellationToken ct) => await _orderRepository.GetOrdersAsync(ct);
+        public async Task<string> ApproveAsync(Guid id, CancellationToken ct) => await ChangeStatus(id, order => order.Approve(), ct);
+        public async Task<string> ShipAsync(Guid id, CancellationToken ct) => await ChangeStatus(id, order => order.Ship(), ct);
+        public async Task<string> DeliverAsync(Guid id, CancellationToken ct) => await ChangeStatus(id, order => order.Deliver(), ct);
+        public async Task<string> CancelAsync(Guid id, CancellationToken ct) => await ChangeStatus(id, order => order.Cancel(), ct);
+
+        private async Task<string> ChangeStatus(Guid id, Action<Order> change, CancellationToken ct)
+        {
+            Order? order = await _orderRepository.GetByIdAsync(id, ct);
+            if (order is null)
+                throw new NotFoundException("Order is not defined");
+
+            change(order);
+            await _unitOfWork.SaveChangesAsync(ct);
+
+            return order.Status.ToString();
+        }
     }
 }

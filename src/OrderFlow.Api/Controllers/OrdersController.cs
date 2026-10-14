@@ -28,5 +28,22 @@ namespace OrderFlow.Api.Controllers
             return Ok(await _orderService.GetByIdAsync(id, cancellationToken));
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetOrders(CancellationToken cancellationToken)
+        {
+            return Ok(await _orderService.GetOrdersAsync(cancellationToken));
+        }
+
+        [HttpPost("{id:guid}/approve")]
+        public async Task<IActionResult> Approve(Guid id, CancellationToken cancellationToken) => Ok(await _orderService.ApproveAsync(id, cancellationToken));
+
+        [HttpPost("{id:guid}/ship")]
+        public async Task<IActionResult> Ship(Guid id, CancellationToken cancellationToken) => Ok(await _orderService.ShipAsync(id, cancellationToken));
+
+        [HttpPost("{id:guid}/deliver")]
+        public async Task<IActionResult> Deliver(Guid id, CancellationToken cancellationToken) => Ok(await _orderService.DeliverAsync(id, cancellationToken));
+
+        [HttpPost("{id:guid}/cancel")]
+        public async Task<IActionResult> Cancel(Guid id, CancellationToken cancellationToken) => Ok(await _orderService.CancelAsync(id, cancellationToken));
     }
 }

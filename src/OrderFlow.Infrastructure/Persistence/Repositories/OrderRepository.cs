@@ -24,5 +24,10 @@ namespace OrderFlow.Infrastructure.Persistence.Repositories
         {
             return await _context.Orders.Include(o => o.Items).FirstOrDefaultAsync(o => o.Id == id, cancellationToken);
         }
+
+        public async Task<List<Order>> GetOrdersAsync(CancellationToken cancellationToken)
+        {
+            return await _context.Orders.Include(o => o.Items).ToListAsync(cancellationToken);
+        }
     }
 }
