@@ -18,6 +18,7 @@ namespace OrderFlow.Api.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create(CreateDealerRequest request, CancellationToken cancellationToken)
         {
             var id = await _dealerService.CreateAsync(request.Code, request.Name, request.CreditLimit, cancellationToken);
@@ -25,6 +26,7 @@ namespace OrderFlow.Api.Controllers
         }
 
         [HttpGet("{id:guid}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
         {
             var dealer = await _dealerService.GetByIdAsync(id, cancellationToken);
@@ -36,6 +38,7 @@ namespace OrderFlow.Api.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetDealers(CancellationToken cancellationToken)
         {
             return Ok(await _dealerService.GetDealersAsync(cancellationToken));

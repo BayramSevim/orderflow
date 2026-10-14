@@ -20,6 +20,7 @@ namespace OrderFlow.Api.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create(CreateProductRequest request, CancellationToken cancellationToken)
         {
             var id = await _productService.CreateAsync(request.Code, request.Name, request.Price, request.StockQuantity, cancellationToken);

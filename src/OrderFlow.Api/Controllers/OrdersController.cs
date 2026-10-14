@@ -43,14 +43,17 @@ namespace OrderFlow.Api.Controllers
         }
 
         [HttpPost("{id:guid}/approve")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Approve(Guid id, [FromServices] ICommandHandler<ChangeOrderStatusCommand, string> handler, CancellationToken cancellationToken)
         => Ok(await handler.Handle(new ChangeOrderStatusCommand(id, OrderAction.Approve), cancellationToken));
 
         [HttpPost("{id:guid}/ship")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Ship(Guid id, [FromServices] ICommandHandler<ChangeOrderStatusCommand, string> handler, CancellationToken cancellationToken)
         => Ok(await handler.Handle(new ChangeOrderStatusCommand(id, OrderAction.Ship), cancellationToken));
 
         [HttpPost("{id:guid}/deliver")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Deliver(Guid id, [FromServices] ICommandHandler<ChangeOrderStatusCommand, string> handler, CancellationToken cancellationToken)
         => Ok(await handler.Handle(new ChangeOrderStatusCommand(id, OrderAction.Deliver), cancellationToken));
 
