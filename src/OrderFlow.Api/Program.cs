@@ -1,3 +1,5 @@
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using OrderFlow.Api.ErrorHandling;
 using OrderFlow.Application.Common;
@@ -8,6 +10,11 @@ using OrderFlow.Infrastructure.Persistence;
 using OrderFlow.Infrastructure.Persistence.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
+
+
+// Validator
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 builder.Services.AddControllers();
 
@@ -30,8 +37,11 @@ builder.Services.AddScoped<OrderService>();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+ValidatorOptions.Global.LanguageManager.Culture = new System.Globalization.CultureInfo("en");
 
 var app = builder.Build();
 
