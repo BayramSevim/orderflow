@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OrderFlow.Api.Auth;
 using OrderFlow.Api.Dealers;
@@ -13,6 +14,7 @@ namespace OrderFlow.Api.Controllers
     public class AuthController : ControllerBase
     {
         [HttpPost("register")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Register(
                             RegisterRequest request,
                             [FromServices] ICommandHandler<RegisterUserCommand, Guid> handler,

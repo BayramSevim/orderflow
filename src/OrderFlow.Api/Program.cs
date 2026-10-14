@@ -101,6 +101,8 @@ ValidatorOptions.Global.LanguageManager.Culture = new System.Globalization.Cultu
 
 var app = builder.Build();
 
+await DbSeeder.SeedAdminAsync(app.Services, app.Configuration);
+
 app.UseExceptionHandler();
 
 // Configure the HTTP request pipeline.
