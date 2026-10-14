@@ -70,10 +70,57 @@ namespace OrderFlow.Application.Orders
         }
 
         public async Task<List<Order>> GetOrdersAsync(CancellationToken ct) => await _orderRepository.GetOrdersAsync(ct);
-        public async Task<string> ApproveAsync(Guid id, CancellationToken ct) => await ChangeStatus(id, order => order.Approve(), ct);
+        public async Task<string> ApproveAsync(Guid id, CancellationToken ct)
+        {
+            Order? order = await _orderRepository.GetByIdAsync(id, ct);
+            if (order is null)
+                throw new NotFoundException("Order is not defined");
+
+            order.Approve();
+
+            foreach (var line in order.Items)
+            {
+                Product? product = await _productRepository.GetByIdAsync(line.ProductId, ct);
+                if (product is null)
+                    throw new NotFoundException("Product is not defined");
+
+                product.DecreaseStock(line.Quantity);
+            }
+
+            await _unitOfWork.SaveChangesAsync(ct);
+            return order.Status.ToString();
+        }
+
+        public async Task<string> CancelAsync(Guid id, CancellationToken ct)
+        {
+            Order? order = await _orderRepository.GetByIdAsync(id, ct);
+            if (order is null)
+                throw new NotFoundException("Order is not defined");
+
+
+            var wasApproved = order.Status == OrderStatus.Approved;
+
+            if (wasApproved)
+            {
+                foreach (var line in order.Items)
+                {
+                    Product? product = await _productRepository.GetByIdAsync(line.ProductId, ct);
+                    if (product is null)
+                        throw new NotFoundException("Product is not defined");
+
+                    product.IncreaseStock(line.Quantity);
+                }
+            }
+
+            order.Cancel();
+
+            await _unitOfWork.SaveChangesAsync(ct);
+            return order.Status.ToString();
+        }
+
+
         public async Task<string> ShipAsync(Guid id, CancellationToken ct) => await ChangeStatus(id, order => order.Ship(), ct);
         public async Task<string> DeliverAsync(Guid id, CancellationToken ct) => await ChangeStatus(id, order => order.Deliver(), ct);
-        public async Task<string> CancelAsync(Guid id, CancellationToken ct) => await ChangeStatus(id, order => order.Cancel(), ct);
 
         private async Task<string> ChangeStatus(Guid id, Action<Order> change, CancellationToken ct)
         {

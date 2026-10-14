@@ -14,6 +14,7 @@ namespace OrderFlow.Domain.Products
         public decimal Price { get; private set; }
         public int StockQuantity { get; private set; }
         public bool IsActive { get; private set; }
+        public uint Version { get; private set; }
 
         public Product(string code, string name, decimal price, int stockQuantity)
         {
@@ -46,6 +47,24 @@ namespace OrderFlow.Domain.Products
         public void Deactivate()
         {
             IsActive = false;
+        }
+
+        public void DecreaseStock(int quantity)
+        {
+            if (quantity <= 0)
+                throw new DomainException("Quantity must be greater than zero");
+            if (StockQuantity < quantity)
+                throw new DomainException($"Insufficient stock for {Code}");
+
+            StockQuantity -= quantity;
+        }
+
+        public void IncreaseStock(int quantity)
+        {
+            if (quantity <= 0)
+                throw new DomainException("Quantity must be greater than zero");
+
+            StockQuantity += quantity;
         }
     }
 }

@@ -26,6 +26,8 @@ namespace OrderFlow.Infrastructure.Persistence.Configurations
             builder.Property(d => d.Price)
                 .HasPrecision(18, 2);
 
+            builder.Property(p => p.Version)
+                    .IsRowVersion();
         }
     }
 }

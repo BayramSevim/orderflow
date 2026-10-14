@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using OrderFlow.Domain.Exceptions;
 
 namespace OrderFlow.Api.ErrorHandling
@@ -23,6 +24,7 @@ namespace OrderFlow.Api.ErrorHandling
                 NotFoundException => (StatusCodes.Status404NotFound, "Resource not found"),
                 ConflictException => (StatusCodes.Status409Conflict, "Conflict"),
                 DomainException => (StatusCodes.Status400BadRequest, "Business rule violation"),
+                DbUpdateConcurrencyException => (StatusCodes.Status409Conflict, "Concurrency conflict"),
                 _ => (StatusCodes.Status500InternalServerError, "An unexpected error occurred")
             };
 
@@ -33,7 +35,7 @@ namespace OrderFlow.Api.ErrorHandling
             {
                 Status = status,
                 Title = title,
-                Detail = exception is DomainException ? exception.Message : null
+                Detail = exception is DomainException or DbUpdateConcurrencyException ? exception.Message : null
             };
 
             httpContext.Response.StatusCode = status;
