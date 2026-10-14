@@ -18,6 +18,8 @@ namespace OrderFlow.Infrastructure.Persistence
             var context = scope.ServiceProvider.GetRequiredService<OrderFlowDbContext>();
             var hasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
 
+            await context.Database.MigrateAsync();
+
             if (await context.Users.AnyAsync())
                 return;
 

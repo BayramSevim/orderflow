@@ -12,7 +12,7 @@ Built with .NET 8, Clean Architecture, CQRS, EF Core and PostgreSQL.
 - Entity Framework Core 8 with PostgreSQL 17 (Npgsql)
 - JWT authentication, role-based authorization, BCrypt password hashing
 - FluentValidation, Scrutor
-- xUnit
+- xUnit, Testcontainers, WebApplicationFactory
 - Docker Compose, GitHub Actions
 
 ## Architecture
@@ -26,6 +26,7 @@ src/
 tests/
   OrderFlow.Domain.Tests
   OrderFlow.Application.Tests
+  OrderFlow.Api.IntegrationTests
 ```
 
 Dependencies point inward: `Api → Application → Domain`, and `Infrastructure` implements the interfaces defined in `Application`. The domain does not know about the database or HTTP.
@@ -73,13 +74,12 @@ Requirements: .NET SDK (see `global.json`), Docker.
 
 ```bash
 docker compose up -d
-dotnet ef database update --project src/OrderFlow.Infrastructure --startup-project src/OrderFlow.Api
 dotnet run --project src/OrderFlow.Api
 ```
 
 Open http://localhost:5079/swagger.
 
-On first start an admin user is created from `appsettings.Development.json`:
+On startup the app applies pending migrations, and on first start it creates an admin user from `appsettings.Development.json`:
 
 - Email: `admin@orderflow.local`
 - Password: `Admin12345`
@@ -113,10 +113,10 @@ dotnet test
 
 - **Domain tests** cover entity rules: order state transitions, totals, stock changes, user role rules.
 - **Application tests** run the handlers against in-memory fakes of the repositories, unit of work and current user. They cover stock reservation and restoration, price snapshots, ownership checks, and that nothing is saved when a rule fails.
+- **Integration tests** start a real PostgreSQL container with Testcontainers and host the API in memory with `WebApplicationFactory`. They send real HTTP requests to check authentication, the full order flow (create, approve, stock decreased in the database) and dealer ownership. Docker is required to run them.
 
 Tests run on every push with GitHub Actions.
 
 ## Roadmap
 
-- Integration tests with Testcontainers and `WebApplicationFactory`
 - Order events published to RabbitMQ through a transactional outbox
