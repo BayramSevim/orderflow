@@ -3,8 +3,11 @@ using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using OrderFlow.Api.ErrorHandling;
 using OrderFlow.Application.Common;
+using OrderFlow.Application.Common.Messaging;
 using OrderFlow.Application.Dealers;
 using OrderFlow.Application.Orders;
+using OrderFlow.Application.Orders.Commands;
+using OrderFlow.Application.Orders.Queries;
 using OrderFlow.Application.Products;
 using OrderFlow.Infrastructure.Persistence;
 using OrderFlow.Infrastructure.Persistence.Repositories;
@@ -31,11 +34,18 @@ builder.Services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<OrderFlowDbC
 // Services
 builder.Services.AddScoped<DealerService>();
 builder.Services.AddScoped<ProductService>();
-builder.Services.AddScoped<OrderService>();
 
 // ExceptionHandler
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
+
+// CQRS
+builder.Services.Scan(scan => scan
+    .FromAssemblyOf<CreateOrderHandler>()
+    .AddClasses(c => c.AssignableTo(typeof(ICommandHandler<,>)))
+        .AsImplementedInterfaces().WithScopedLifetime()
+    .AddClasses(c => c.AssignableTo(typeof(IQueryHandler<,>)))
+        .AsImplementedInterfaces().WithScopedLifetime());
 
 
 builder.Services.AddEndpointsApiExplorer();
