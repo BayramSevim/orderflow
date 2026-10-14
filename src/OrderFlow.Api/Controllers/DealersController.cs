@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OrderFlow.Api.Dealers;
 using OrderFlow.Application.Dealers;
@@ -6,6 +7,7 @@ namespace OrderFlow.Api.Controllers
 {
     [ApiController]
     [Route("api/dealers")]
+    [Authorize]
     public class DealersController : ControllerBase
     {
         private readonly DealerService _dealerService;

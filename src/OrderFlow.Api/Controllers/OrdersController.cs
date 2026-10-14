@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OrderFlow.Api.Orders;
 using OrderFlow.Application.Common.Messaging;
@@ -9,6 +10,7 @@ namespace OrderFlow.Api.Controllers
 {
     [ApiController]
     [Route("api/orders")]
+    [Authorize]
     public class OrdersController : ControllerBase
     {
 

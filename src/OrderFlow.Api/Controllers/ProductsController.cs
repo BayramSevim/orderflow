@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OrderFlow.Api.Dealers;
 using OrderFlow.Api.Products;
@@ -8,6 +9,7 @@ namespace OrderFlow.Api.Controllers
 {
     [ApiController]
     [Route("api/products")]
+    [Authorize]
     public class ProductsController : ControllerBase
     {
         private readonly ProductService _productService;

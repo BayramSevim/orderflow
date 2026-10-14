@@ -28,6 +28,10 @@ namespace OrderFlow.Domain.Users
                 if (dealerId is null)
                     throw new DomainException("Dealer users must belong to a dealer");
             }
+
+            if (role == "Admin" && dealerId is not null)
+                throw new DomainException("Admin users cannot belong to a dealer");
+
             Id = Guid.NewGuid();
             Email = email;
             PasswordHash = passwordHash;
