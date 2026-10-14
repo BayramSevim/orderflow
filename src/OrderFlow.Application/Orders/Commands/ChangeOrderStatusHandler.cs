@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using OrderFlow.Application.Common;
 using OrderFlow.Application.Common.Messaging;
 using OrderFlow.Application.Dealers;
+using OrderFlow.Application.Orders.Events;
 using OrderFlow.Application.Products;
 using OrderFlow.Domain.Exceptions;
 using OrderFlow.Domain.Orders;
@@ -22,13 +23,19 @@ namespace OrderFlow.Application.Orders.Commands
         private readonly IProductRepository _productRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly ICurrentUser _currentUser;
+        private readonly IOutbox _outbox;
 
-        public ChangeOrderStatusHandler(IOrderRepository orderRepository, IProductRepository productRepository, IUnitOfWork unitOfWork, ICurrentUser currentUser)
+        public ChangeOrderStatusHandler(IOrderRepository orderRepository,
+                                        IProductRepository productRepository,
+                                        IUnitOfWork unitOfWork,
+                                        ICurrentUser currentUser,
+                                        IOutbox outbox)
         {
             _orderRepository = orderRepository;
             _unitOfWork = unitOfWork;
             _productRepository = productRepository;
             _currentUser = currentUser;
+            _outbox = outbox;
         }
 
         public async Task<string> Handle(ChangeOrderStatusCommand command, CancellationToken cancellationToken)
@@ -53,6 +60,7 @@ namespace OrderFlow.Application.Orders.Commands
 
                         product.DecreaseStock(line.Quantity);
                     }
+                    _outbox.Add(new OrderApprovedEvent(order.Id, order.DealerId, order.Total, DateTime.UtcNow));
 
                     break;
                 case OrderAction.Ship:

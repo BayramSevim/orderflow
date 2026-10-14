@@ -4,6 +4,7 @@ using OrderFlow.Domain.Dealers;
 using OrderFlow.Domain.Orders;
 using OrderFlow.Domain.Products;
 using OrderFlow.Domain.Users;
+using OrderFlow.Infrastructure.Outbox;
 
 namespace OrderFlow.Infrastructure.Persistence
 {
@@ -13,6 +14,7 @@ namespace OrderFlow.Infrastructure.Persistence
         public DbSet<Product> Products => Set<Product>();
         public DbSet<Order> Orders => Set<Order>();
         public DbSet<User> Users => Set<User>();
+        public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
 
         public OrderFlowDbContext(DbContextOptions<OrderFlowDbContext> options) : base(options)
         {

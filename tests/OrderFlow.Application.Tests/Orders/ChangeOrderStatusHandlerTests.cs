@@ -1,4 +1,5 @@
 using OrderFlow.Application.Orders.Commands;
+using OrderFlow.Application.Orders.Events;
 using OrderFlow.Application.Tests.Fakes;
 using OrderFlow.Domain.Exceptions;
 using OrderFlow.Domain.Orders;
@@ -23,13 +24,18 @@ namespace OrderFlow.Application.Tests.Orders
             order.AddItem(product.Id, product.Name, product.Price, 30);
             orders.Orders.Add(order);
 
-            var handler = new ChangeOrderStatusHandler(orders, products, unitOfWork, currentUser);
+            var outbox = new FakeOutbox();
+
+            var handler = new ChangeOrderStatusHandler(orders, products, unitOfWork, currentUser, outbox);
 
             await handler.Handle(new ChangeOrderStatusCommand(order.Id, OrderAction.Approve), CancellationToken.None);
 
             Assert.Equal(70, product.StockQuantity);
             Assert.Equal(OrderStatus.Approved, order.Status);
             Assert.Equal(1, unitOfWork.SaveCount);
+
+            var evt = Assert.IsType<OrderApprovedEvent>(Assert.Single(outbox.Messages));
+            Assert.Equal(order.Id, evt.OrderId);
         }
 
         [Fact]
@@ -47,7 +53,9 @@ namespace OrderFlow.Application.Tests.Orders
             order.AddItem(product.Id, product.Name, product.Price, 30);
             orders.Orders.Add(order);
 
-            var handler = new ChangeOrderStatusHandler(orders, products, unitOfWork, currentUser);
+            var outbox = new FakeOutbox();
+
+            var handler = new ChangeOrderStatusHandler(orders, products, unitOfWork, currentUser, outbox);
 
             await handler.Handle(new ChangeOrderStatusCommand(order.Id, OrderAction.Approve), CancellationToken.None);
             await handler.Handle(new ChangeOrderStatusCommand(order.Id, OrderAction.Cancel), CancellationToken.None);
@@ -72,7 +80,9 @@ namespace OrderFlow.Application.Tests.Orders
             order.AddItem(product.Id, product.Name, product.Price, 30);
             orders.Orders.Add(order);
 
-            var handler = new ChangeOrderStatusHandler(orders, products, unitOfWork, currentUser);
+            var outbox = new FakeOutbox();
+
+            var handler = new ChangeOrderStatusHandler(orders, products, unitOfWork, currentUser, outbox);
 
             await Assert.ThrowsAsync<DomainException>(() => handler.Handle(new ChangeOrderStatusCommand(order.Id, OrderAction.Approve), CancellationToken.None));
 
@@ -95,7 +105,9 @@ namespace OrderFlow.Application.Tests.Orders
             order.AddItem(product.Id, product.Name, product.Price, 30);
             orders.Orders.Add(order);
 
-            var handler = new ChangeOrderStatusHandler(orders, products, unitOfWork, currentUser);
+            var outbox = new FakeOutbox();
+
+            var handler = new ChangeOrderStatusHandler(orders, products, unitOfWork, currentUser, outbox);
 
             await handler.Handle(new ChangeOrderStatusCommand(order.Id, OrderAction.Cancel), CancellationToken.None);
 
@@ -121,12 +133,15 @@ namespace OrderFlow.Application.Tests.Orders
             order.AddItem(product.Id, product.Name, product.Price, 30);
             orders.Orders.Add(order);
 
-            var handler = new ChangeOrderStatusHandler(orders, products, unitOfWork, currentUser);
+            var outbox = new FakeOutbox();
+
+            var handler = new ChangeOrderStatusHandler(orders, products, unitOfWork, currentUser, outbox);
 
             await Assert.ThrowsAsync<NotFoundException>(() => handler.Handle(new ChangeOrderStatusCommand(order.Id, OrderAction.Cancel), CancellationToken.None));
 
             Assert.Equal(OrderStatus.Pending, order.Status);
             Assert.Equal(0, unitOfWork.SaveCount);
+            Assert.Empty(outbox.Messages);
         }
     }
 }

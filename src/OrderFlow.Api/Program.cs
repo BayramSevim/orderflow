@@ -15,6 +15,7 @@ using OrderFlow.Application.Orders.Commands;
 using OrderFlow.Application.Orders.Queries;
 using OrderFlow.Application.Products;
 using OrderFlow.Application.Users;
+using OrderFlow.Infrastructure.Outbox;
 using OrderFlow.Infrastructure.Persistence;
 using OrderFlow.Infrastructure.Persistence.Repositories;
 using OrderFlow.Infrastructure.Security;
@@ -43,8 +44,10 @@ builder.Services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<OrderFlowDbC
 builder.Services.AddScoped<DealerService>();
 builder.Services.AddScoped<ProductService>();
 
+// Helpers
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUser, CurrentUser>();
+builder.Services.AddScoped<IOutbox, EfOutbox>();
 
 // ExceptionHandler
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
