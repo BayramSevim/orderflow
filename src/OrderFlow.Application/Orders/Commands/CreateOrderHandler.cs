@@ -20,16 +20,21 @@ namespace OrderFlow.Application.Orders.Commands
         private readonly IDealerRepository _dealerRepository;
         private readonly IProductRepository _productRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ICurrentUser _currentUser;
 
-        public CreateOrderHandler(IOrderRepository orderRepository, IDealerRepository dealerRepository, IProductRepository productRepository, IUnitOfWork unitOfWork)
+        public CreateOrderHandler(IOrderRepository orderRepository, IDealerRepository dealerRepository, IProductRepository productRepository, IUnitOfWork unitOfWork, ICurrentUser currentUser)
         {
             _orderRepository = orderRepository;
             _productRepository = productRepository;
             _unitOfWork = unitOfWork;
             _dealerRepository = dealerRepository;
+            _currentUser = currentUser;
         }
         public async Task<Guid> Handle(CreateOrderCommand command, CancellationToken cancellationToken)
         {
+            if (!_currentUser.IsAdmin && command.DealerId != _currentUser.DealerId)
+                throw new ForbiddenException("You can only create orders for your own dealer");
+
             Dealer? dealer = await _dealerRepository.GetByIdAsync(command.DealerId, cancellationToken);
             if (dealer is null)
                 throw new NotFoundException("Dealer is not defined");

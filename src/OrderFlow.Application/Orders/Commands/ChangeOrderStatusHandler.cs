@@ -21,18 +21,23 @@ namespace OrderFlow.Application.Orders.Commands
         private readonly IOrderRepository _orderRepository;
         private readonly IProductRepository _productRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ICurrentUser _currentUser;
 
-        public ChangeOrderStatusHandler(IOrderRepository orderRepository, IProductRepository productRepository, IUnitOfWork unitOfWork)
+        public ChangeOrderStatusHandler(IOrderRepository orderRepository, IProductRepository productRepository, IUnitOfWork unitOfWork, ICurrentUser currentUser)
         {
             _orderRepository = orderRepository;
             _unitOfWork = unitOfWork;
             _productRepository = productRepository;
+            _currentUser = currentUser;
         }
 
         public async Task<string> Handle(ChangeOrderStatusCommand command, CancellationToken cancellationToken)
         {
             Order? order = await _orderRepository.GetByIdAsync(command.OrderId, cancellationToken);
             if (order is null)
+                throw new NotFoundException("Order is not defined");
+
+            if (!_currentUser.IsAdmin && order.DealerId != _currentUser.DealerId)
                 throw new NotFoundException("Order is not defined");
 
             switch (command.Action)

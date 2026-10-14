@@ -20,6 +20,11 @@ namespace OrderFlow.Infrastructure.Persistence.Repositories
             await _context.Orders.AddAsync(order, cancellationToken);
         }
 
+        public async Task<List<Order>> GetByDealerIdAsync(Guid dealerId, CancellationToken cancellationToken)
+        {
+            return await _context.Orders.Include(o => o.Items).Where(x => x.DealerId == dealerId).ToListAsync(cancellationToken);
+        }
+
         public async Task<Order?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
         {
             return await _context.Orders.Include(o => o.Items).FirstOrDefaultAsync(o => o.Id == id, cancellationToken);

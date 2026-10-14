@@ -7,5 +7,6 @@ namespace OrderFlow.Application.Orders
         Task<Order?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
         Task AddAsync(Order order, CancellationToken cancellationToken);
         Task<List<Order>> GetOrdersAsync(CancellationToken cancellationToken);
+        Task<List<Order>> GetByDealerIdAsync(Guid dealerId, CancellationToken cancellationToken);
     }
 }
