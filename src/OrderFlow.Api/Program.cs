@@ -11,6 +11,7 @@ using OrderFlow.Application.Orders.Queries;
 using OrderFlow.Application.Products;
 using OrderFlow.Infrastructure.Persistence;
 using OrderFlow.Infrastructure.Persistence.Repositories;
+using OrderFlow.Infrastructure.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,6 +48,9 @@ builder.Services.Scan(scan => scan
     .AddClasses(c => c.AssignableTo(typeof(IQueryHandler<,>)))
         .AsImplementedInterfaces().WithScopedLifetime());
 
+
+// Password Hash
+builder.Services.AddSingleton<IPasswordHasher, BCryptPasswordHasher>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
