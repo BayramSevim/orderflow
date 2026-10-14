@@ -3,6 +3,7 @@ using OrderFlow.Application.Common;
 using OrderFlow.Domain.Dealers;
 using OrderFlow.Domain.Orders;
 using OrderFlow.Domain.Products;
+using OrderFlow.Domain.Users;
 
 namespace OrderFlow.Infrastructure.Persistence
 {
@@ -11,6 +12,7 @@ namespace OrderFlow.Infrastructure.Persistence
         public DbSet<Dealer> Dealers => Set<Dealer>();
         public DbSet<Product> Products => Set<Product>();
         public DbSet<Order> Orders => Set<Order>();
+        public DbSet<User> Users => Set<User>();
 
         public OrderFlowDbContext(DbContextOptions<OrderFlowDbContext> options) : base(options)
         {

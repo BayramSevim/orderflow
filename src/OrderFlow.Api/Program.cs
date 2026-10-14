@@ -9,6 +9,7 @@ using OrderFlow.Application.Orders;
 using OrderFlow.Application.Orders.Commands;
 using OrderFlow.Application.Orders.Queries;
 using OrderFlow.Application.Products;
+using OrderFlow.Application.Users;
 using OrderFlow.Infrastructure.Persistence;
 using OrderFlow.Infrastructure.Persistence.Repositories;
 using OrderFlow.Infrastructure.Security;
@@ -30,6 +31,7 @@ builder.Services.AddDbContext<OrderFlowDbContext>(options =>
 builder.Services.AddScoped<IDealerRepository, DealerRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<OrderFlowDbContext>());
 
 // Services
