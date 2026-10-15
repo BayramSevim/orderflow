@@ -1,5 +1,7 @@
 using System.Text;
 using System.Text.Json;
+using Dapper;
+using Npgsql;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
@@ -22,6 +24,14 @@ public class OrderApprovedConsumer : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        await using var db = new NpgsqlConnection(_configuration.GetConnectionString("Shipment"));
+        await db.ExecuteAsync("""
+                CREATE TABLE IF NOT EXISTS processed_messages (
+                    message_id   uuid PRIMARY KEY,
+                    processed_at timestamptz NOT NULL DEFAULT now()
+                )
+                """);
+
         var factory = new ConnectionFactory { HostName = _configuration["RabbitMq:Host"] ?? "localhost" };
         await using var connection = await factory.CreateConnectionAsync(stoppingToken);
         await using var channel = await connection.CreateChannelAsync(cancellationToken: stoppingToken);
@@ -37,6 +47,19 @@ public class OrderApprovedConsumer : BackgroundService
             {
                 var json = Encoding.UTF8.GetString(args.Body.Span);
                 var message = JsonSerializer.Deserialize<OrderApprovedMessage>(json)!;
+
+                var messageId = Guid.Parse(args.BasicProperties.MessageId!);
+
+                var inserted = await db.ExecuteAsync(
+                    "INSERT INTO processed_messages (message_id) VALUES (@Id) ON CONFLICT (message_id) DO NOTHING",
+                    new { Id = messageId });
+
+                if (inserted == 0)
+                {
+                    _logger.LogInformation("Message {MessageId} already processed, skipping", messageId);
+                    await channel.BasicAckAsync(args.DeliveryTag, multiple: false);
+                    return;
+                }
 
                 _logger.LogInformation("Preparing shipment for order {OrderId}, dealer {DealerId}, total {Total}",
                     message.OrderId, message.DealerId, message.Total);
