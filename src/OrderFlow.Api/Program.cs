@@ -15,6 +15,7 @@ using OrderFlow.Application.Orders.Commands;
 using OrderFlow.Application.Orders.Queries;
 using OrderFlow.Application.Products;
 using OrderFlow.Application.Users;
+using OrderFlow.Infrastructure.Messaging;
 using OrderFlow.Infrastructure.Outbox;
 using OrderFlow.Infrastructure.Persistence;
 using OrderFlow.Infrastructure.Persistence.Repositories;
@@ -65,6 +66,10 @@ builder.Services.Scan(scan => scan
 // Password Hash
 builder.Services.AddSingleton<IPasswordHasher, BCryptPasswordHasher>();
 builder.Services.AddSingleton<ITokenService, JwtTokenService>();
+
+// Message Broker
+builder.Services.AddSingleton<RabbitMqPublisher>();
+builder.Services.AddHostedService<OutboxProcessor>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
